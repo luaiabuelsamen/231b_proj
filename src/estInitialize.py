@@ -27,9 +27,8 @@ def estInitialize():
                      color
                      ]
 
-    # replace these names with yours. Delete the second name if you are working alone.
-    studentNames = ['Bart Simpson',
-                    'Lisa Simpson']
+    studentNames = ['Luai Abuelsamen',
+                    'Douglas Hutchings']
     
     # replace this with the estimator type. Use one of the following options:
     #  'EKF' for Extended Kalman Filter

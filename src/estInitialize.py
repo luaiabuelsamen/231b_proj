@@ -36,7 +36,7 @@ def estInitialize():
     #  'PF' for Particle Filter
     #  'OTHER: XXX' if you're using something else, in which case please
     #                 replace "XXX" with a (very short) description
-    estimatorType = 'EKF'  
+    estimatorType = 'UKF'  
     
     return internalState, studentNames, estimatorType
 

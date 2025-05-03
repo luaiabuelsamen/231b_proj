@@ -29,6 +29,24 @@ def estInitialize():
                      ]
     '''
 
+    #        x_state, P, Evv, Eww, r, B = internalStateIn
+
+    #Initial state mean and variance
+    # x, y, theta
+
+    theta = np.deg2rad(45) #we are heading north-east, which is approxiamtely 45 degrees from theta=0 being the x axis.
+
+    x_state = np.array([[0.0], [0.0], [theta]])
+    P = np.diag([1.0, 1.0, 0.1])        #variance on the initial state.  These, are guesses.
+
+    #Process/ Meas noise variance
+    Evv = np.diag([0.01, 0.01, 0.005])
+    Eww = np.diag([0.1, 0.1])
+
+    #TODO: Augment as latent state
+    r = 0.425
+    B = 0.8
+
 
 
     internalStateDoug = []
@@ -37,20 +55,18 @@ def estInitialize():
     r = 0.425
     var_r = r*(1/12)*((1.05-0.95)**2)   #Same idea with the wheel rim radius, but with +/- 5%.
 
-    x = 0
-    y = 0 
-    #todo var?
-
-    theta = np.deg2rad(45) #we are heading north-east, which is approxiamtely 45 degrees from theta=0 being the x axis.
 
 
 
-    internalState = [x,
-                     y,
-                     theta, 
-                     color
-                     ]
 
+    internalState = [
+        x_state,
+        P,
+        Evv,
+        Eww,
+        r,
+        B]
+        
 
     studentNames = ['Luai Abuelsamen',
                     'Douglas Hutchings']

@@ -48,21 +48,9 @@ def estRun(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement):
 
 
 def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement):
-    if isinstance(internalStateIn, list) and len(internalStateIn) == 4:
-        #Initial state mean and variance
-        # x, y, theta
-        x_state = np.array([[0.0], [0.0], [0.0]])
-        P = np.diag([1.0, 1.0, 0.1])
 
-        #Process/ Meas noise variance
-        Evv = np.diag([0.01, 0.01, 0.005])
-        Eww = np.diag([0.1, 0.1])
+    x_state, P, Evv, Eww, r, B = internalStateIn
 
-        #TODO: Augment as latent state
-        r = 0.425
-        B = 0.8
-    else:
-        x_state, P, Evv, Eww, r, B = internalStateIn
 
     nx = 3
     lambda_ = 3 - nx

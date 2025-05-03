@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 
 from scipy.stats import norm
 
-experimentalData = np.genfromtxt ('data/run_000.csv', delimiter=',')
+datafile = 'data/run_000.csv'
+
+experimentalData = np.genfromtxt (datafile, delimiter=',')
 
 
 t = experimentalData[:,0]
@@ -23,8 +25,10 @@ print(gamma)
 #print(omega)
 #print
 
-assert np.all(gamma[:]==0), 'Non-zero steering angles detected in the calibration data!'
-assert np.all(omega[:]==0), 'Non-zero pedal speeds detected in the calibration data!'
+
+if datafile == 'data/run_000.csv':
+	assert np.all(gamma[:]==0), 'Non-zero steering angles detected in the calibration data!'
+	assert np.all(omega[:]==0), 'Non-zero pedal speeds detected in the calibration data!'
 
 
 print("Known Bike position:",final_x,final_y)
@@ -40,8 +44,13 @@ print("GPS Standard Error of the Mean",np.nanstd(measx)/np.sqrt(np.count_nonzero
 print("N Sigma:",(np.nanmean(measx)-final_x)/(np.nanstd(measx)/np.sqrt(np.count_nonzero(~np.isnan(measx)))),(np.nanmean(measy)-final_y)/(np.nanstd(measy)/np.sqrt(np.count_nonzero(~np.isnan(measy)))))
 
 
+
+print("----------")
+non_nan_locs = np.where(~np.isnan(measx))
+print("Average Period:",np.diff(t[non_nan_locs]))
+
 plt.figure()
-plt.subplot(2,1,1)
+plt.subplot(3,1,1)
 plt.hist(measx,bins=50,density=True)
 plt.axvline(x=np.nanmean(measx),c='b',label='E[GPS_X]')
 plt.axvline(x=final_x,c='g',label='True GPS X')
@@ -54,7 +63,7 @@ plt.plot(x_pts,norm.pdf(x_pts,loc=final_x,scale=np.nanstd(measx)),c='c',label='B
 
 plt.legend()
 
-plt.subplot(2,1,2)
+plt.subplot(3,1,2)
 plt.hist(measy,bins=50,density=True)
 plt.axvline(x=np.nanmean(measy),c='b',label='E[GPS_Y]')
 plt.axvline(x=final_y,c='g',label='True GPS y')
@@ -67,6 +76,10 @@ plt.plot(y_pts,norm.pdf(y_pts,loc=final_y,scale=np.nanstd(measy)),c='c',label='B
 
 
 
+plt.legend()
+plt.subplot(3,1,3)
+plt.hist(np.diff(t[non_nan_locs]),bins=50,density=True)
+plt.axvline(x=0.5,c='b',label='Nominal GPS Period')
 plt.legend()
 
 

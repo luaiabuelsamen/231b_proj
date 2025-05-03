@@ -21,11 +21,36 @@ def estInitialize():
     # note that there is *absolutely no prescribed format* for this internal state.
     # You can put in it whatever you like. Probably, you'll want to keep the position
     # and angle, and probably you'll remove the color.
+    '''
     internalState = [x,
                      y,
                      theta, 
                      color
                      ]
+    '''
+
+
+
+    internalStateDoug = []
+    B =  0.8 # the baseline B is uncertain (to within approximately ±10%)
+    var_B = B*(1/12)*((1.1-0.9)**2)   #treat the wheel base as a uniform random variable, over the range from B+10% to B-10%.
+    r = 0.425
+    var_r = r*(1/12)*((1.05-0.95)**2)   #Same idea with the wheel rim radius, but with +/- 5%.
+
+    x = 0
+    y = 0 
+    #todo var?
+
+    theta = np.deg2rad(45) #we are heading north-east, which is approxiamtely 45 degrees from theta=0 being the x axis.
+
+
+
+    internalState = [x,
+                     y,
+                     theta, 
+                     color
+                     ]
+
 
     studentNames = ['Luai Abuelsamen',
                     'Douglas Hutchings']

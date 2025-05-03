@@ -128,7 +128,7 @@ def run_main(experimentalRun,visualize):
 
 
 if __name__ == "__main__": 
-    scenarios = [1]
+    scenarios = [1,2,3,4,5]
 
     scores = []
 

@@ -3,6 +3,7 @@ import scipy as sp
 import scipy.linalg as linalg
 
 #NO OTHER IMPORTS ALLOWED (However, you're allowed to import e.g. scipy.linalg)
+np.set_printoptions(precision=3)
 
 
 def estRun(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement):
@@ -53,7 +54,6 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
 
 
     nx = 3
-    lambda_ = 3 - nx
 
     #Propogate discretized dynamics
     def A(x, u):

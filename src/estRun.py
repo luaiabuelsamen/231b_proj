@@ -130,6 +130,19 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
 
     # find Pxx
     P_pred = Evv.copy()
+
+    #print(P_pred.T)
+    #scle P_p[0,1] (the x and y process noise) by speed, i guess, the input pedal speed here.
+    #doesn't really help
+    #P_pred[0,0] = np.interp(u[1,0],[0,5],[0.001,0.015])
+    #P_pred[1,1] = np.interp(u[1,0],[0,5],[0.001,0.015])
+    
+
+
+    #print(P_pred.T)
+
+    #0.001 for v=
+
     for i in range(num_sigma_points):
         dx = X_pred[:, i:i+1] - x_pred
         P_pred += (1 / num_sigma_points) * dx @ dx.T

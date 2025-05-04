@@ -73,16 +73,32 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     u = np.array([[steeringAngle], [pedalSpeed]])
 
     # generate sigma points
-    S = np.linalg.cholesky((nx + lambda_) * P)
-    sigma_points = np.zeros((nx, 2 * nx + 1))
-    sigma_points[:, 0] = x_state[:, 0]
-    for i in range(nx):
-        sigma_points[:, i + 1] = (x_state + S[:, i:i+1])[:, 0]
-        sigma_points[:, i + 1 + nx] = (x_state - S[:, i:i+1])[:, 0]
+    S = np.sqrt(nx)*np.linalg.cholesky(P)
+
+
+    num_sigma_points = 2*nx+1 #luai included a sigma point at the current x state - very strange.
+
+    #num_sigma_points = 2*nx #number of sigma points exactly corrisponding to ME231B's notes.
+    
+    sigma_points = np.zeros((nx, num_sigma_points))      #rows of sigma pints matrix corrispond to the states.  Columns is individual sigma points.
+
+    if num_sigma_points ==  2*nx + 1:
+        sigma_points[:, 0] = x_state[:, 0]
+
+    for i in range(nx):                                                          
+        if num_sigma_points ==  2*nx + 1:
+            #need a bunch of off by 1 offsets to include the fact that hthe first sigma point is the mean
+            sigma_points[:, i + 1] = (x_state + S[:, i:i+1])  [:, 0]
+            sigma_points[:, i + 1 + nx] = (x_state - S[:, i:i+1])   [:, 0]
+
+        else:
+            sigma_points[:, i] = (x_state + S[:, i:i+1])  [:, 0]
+            sigma_points[:, i + nx] = (x_state - S[:, i:i+1])   [:, 0]
+
     
     # propogate sigma points through system dynamics
-    X_pred = np.zeros((nx, 2 * nx + 1))
-    for i in range(2 * nx + 1):
+    X_pred = np.zeros((nx, num_sigma_points))
+    for i in range(num_sigma_points):
         X_pred[:, i:i+1] = A(sigma_points[:, i:i+1], u)
 
     # mean over sigma points
@@ -90,13 +106,13 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
 
     # find Pxx
     P_pred = Evv.copy()
-    for i in range(2 * nx + 1):
+    for i in range(num_sigma_points):
         dx = X_pred[:, i:i+1] - x_pred
         P_pred += (1 / (2 * nx)) * dx @ dx.T
 
     #propogate through measurement prediction
-    Z_pred = np.zeros((2, 2 * nx + 1))
-    for i in range(2 * nx + 1):
+    Z_pred = np.zeros((2, num_sigma_points))
+    for i in range(num_sigma_points):
         Z_pred[:, i:i+1] = H(X_pred[:, i:i+1])
     z_pred = np.mean(Z_pred, axis=1, keepdims=True)
         
@@ -113,13 +129,13 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
 
         # Compute Pzz
         P_zz = Eww_used.copy()
-        for i in range(2 * nx + 1):
+        for i in range(num_sigma_points):
             dz = Z_pred_used[:, i:i+1] - z_pred_used
             P_zz += (1 / (2 * nx)) * dz @ dz.T
 
         # Compute cross-covariance
         P_xz = np.zeros((nx, len(valid_indices)))
-        for i in range(2 * nx + 1):
+        for i in range(num_sigma_points):
             dx = X_pred[:, i:i+1] - x_pred
             dx[2] = (dx[2] + np.pi) % (2 * np.pi) - np.pi
             dz = Z_pred_used[:, i:i+1] - z_pred_used

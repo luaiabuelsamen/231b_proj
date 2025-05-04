@@ -76,9 +76,9 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     S = np.sqrt(nx)*np.linalg.cholesky(P)
 
 
-    num_sigma_points = 2*nx+1 #luai included a sigma point at the current x state - very strange.
+    #num_sigma_points = 2*nx+1 #luai included a sigma point at the current x state - very strange.
 
-    #num_sigma_points = 2*nx #number of sigma points exactly corrisponding to ME231B's notes.
+    num_sigma_points = 2*nx #number of sigma points exactly corrisponding to ME231B's notes.
     
     sigma_points = np.zeros((nx, num_sigma_points))      #rows of sigma pints matrix corrispond to the states.  Columns is individual sigma points.
 

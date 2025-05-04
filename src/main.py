@@ -128,12 +128,13 @@ def run_main(experimentalRun,visualize):
 
 
 if __name__ == "__main__": 
-    scenarios = [1,2,3,4,5]
+    #scenarios = [1]#,2,3,4,5]
+    scenarios = list(np.arange(1,100))
 
     scores = []
 
     for run in scenarios:
-        s = run_main(run,visualize=True)
+        s = run_main(run,visualize=False)
         scores.append(s)
 
 

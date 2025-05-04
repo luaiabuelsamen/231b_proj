@@ -38,7 +38,11 @@ def run_main(experimentalRun,visualize):
         measy = experimentalData[k,4]
         
         #run the estimator:
-        x, y, theta, internalState = estRun(t, dt, internalState, gamma, omega, (measx, measy))
+        try:
+            x, y, theta, internalState = estRun(t, dt, internalState, gamma, omega, (measx, measy))
+        except Exception as e:
+            print("ERROR, just quit,",e)
+            break
 
         #keep track:
         estimatedPosition_x[k] = x
@@ -89,7 +93,7 @@ def run_main(experimentalRun,visualize):
 
         figTopView, axTopView = plt.subplots(1, 1)
         axTopView.plot(experimentalData[:,3], experimentalData[:,4], 'rx', label='Meas')
-        axTopView.plot(estimatedPosition_x, estimatedPosition_y, 'b-', label='est')
+        axTopView.plot(estimatedPosition_x, estimatedPosition_y, 'b-*', label='est')
         axTopView.plot(experimentalData[:,5], experimentalData[:,6], 'k:.', label='true')
         axTopView.legend()
         axTopView.set_xlabel('x-position [m]')
@@ -98,14 +102,14 @@ def run_main(experimentalRun,visualize):
         figHist, axHist = plt.subplots(5, 1, sharex=True)
         axHist[0].plot(experimentalData[:,0], experimentalData[:,5], 'k:.', label='true')
         axHist[0].plot(experimentalData[:,0], experimentalData[:,3], 'rx', label='Meas')
-        axHist[0].plot(experimentalData[:,0], estimatedPosition_x, 'b-', label='est')
+        axHist[0].plot(experimentalData[:,0], estimatedPosition_x, 'b-*', label='est')
 
         axHist[1].plot(experimentalData[:,0], experimentalData[:,6], 'k:.', label='true')
         axHist[1].plot(experimentalData[:,0], experimentalData[:,4], 'rx', label='Meas')
-        axHist[1].plot(experimentalData[:,0], estimatedPosition_y, 'b-', label='est')
+        axHist[1].plot(experimentalData[:,0], estimatedPosition_y, 'b-*', label='est')
 
         axHist[2].plot(experimentalData[:,0], experimentalData[:,7], 'k:.', label='true')
-        axHist[2].plot(experimentalData[:,0], estimatedAngle, 'b-', label='est')
+        axHist[2].plot(experimentalData[:,0], estimatedAngle, 'b-*', label='est')
 
         axHist[3].plot(experimentalData[:,0], experimentalData[:,1], 'g-', label='m')
         axHist[4].plot(experimentalData[:,0], experimentalData[:,2], 'g-', label='m')

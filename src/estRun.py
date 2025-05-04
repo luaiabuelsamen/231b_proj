@@ -53,16 +53,20 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     x_state, P, Evv, Eww, r, B = internalStateIn
 
 
-    nx = 3
+    nx = x_state.shape[0]
 
     #Propogate discretized dynamics
     def A(x, u):
         theta = x[2, 0]
-        v_mag = 5 * r * u[1, 0]
+        v_mag = x[3,0]#u[1, 0]
+        steer_angle = x[4,0]
         return np.array([
             [x[0, 0] + dt *  v_mag * np.cos(theta)],
             [x[1, 0] + dt *  v_mag * np.sin(theta)],
-            [x[2, 0] + dt *  (v_mag / B) * np.tan(u[0, 0])]
+            [x[2, 0] + dt *  (v_mag / B) * np.tan(steer_angle)],
+            [5 * r *u[1, 0] ],
+            [u[0,0]]
+
         ])
 
     def H(x):
@@ -74,6 +78,7 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
 
     # generate sigma points
     S = np.sqrt(nx)*np.linalg.cholesky(P)
+    #S = np.sqrt(nx)*linalg.cholesky(P,lower=True)
 
 
     #num_sigma_points = 2*nx+1 #luai included a sigma point at the current x state - very strange.
@@ -149,6 +154,13 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     else:
         x_state = x_pred
         P = P_pred
+
+    #print(u)
+
+    #print("Time,",time,u.T,u[1,0]*r*5)
+    #print(x_state.T)
+    #print(np.diag(P))
+    #print()
 
     x, y, theta = float(x_state[0, 0]), float(x_state[1, 0]), float(x_state[2, 0])
     internalStateOut = [x_state, P, Evv, Eww, r, B]

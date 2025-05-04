@@ -36,12 +36,12 @@ def estInitialize():
 
     theta = np.deg2rad(45) #we are heading north-east, which is approxiamtely 45 degrees from theta=0 being the x axis.
 
-    x_state = np.array([[0.0], [0.0], [theta]])
-    P = np.diag([1.0, 1.0, 0.1])        #variance on the initial state.  These, are guesses.
+    x_state = np.array([[0.0], [0.0], [theta],[0],[0] ])
+    P = np.diag([1.0, 1.0, 0.1,1,1])        #variance on the initial state.  These, are guesses.
 
     #Process/ Meas noise variance
-    Evv = np.diag([0.01, 0.01, 0.005])
-    Eww = np.diag([1.08, 2.984])       #per examilneCalib.py, the y GPS is much noiser than the X
+    Evv = np.diag([0.01, 0.01, 0.001,0.005,0.001])
+    Eww = np.diag([1.088070104075678, 2.9844723942433373])       #per examilneCalib.py, the y GPS is much noiser than the X
 
     #TODO: Augment as latent state
     r = 0.425

@@ -36,11 +36,9 @@ def estInitialize():
 
     theta = np.deg2rad(45) #we are heading north-east, which is approxiamtely 45 degrees from theta=0 being the x axis.
 
-    x_state = np.array([[0.0], [0.0], [theta],[0],[0] ])
-    P = np.diag([1.0, 1.0, 0.1,1,1])        #variance on the initial state.  These, are guesses.
 
     #Process/ Meas noise variance
-    Evv = np.diag([0.01, 0.01, 0.001,0.005,0.001])
+    Evv = np.diag([0.001, 0.001, 0.001,0,0])
     Eww = np.diag([1.088070104075678, 2.9844723942433373])       #per examilneCalib.py, the y GPS is much noiser than the X
 
     #TODO: Augment as latent state
@@ -55,6 +53,8 @@ def estInitialize():
     r = 0.425
     var_r = r*(1/12)*((1.05-0.95)**2)   #Same idea with the wheel rim radius, but with +/- 5%.
 
+    x_state = np.array([[0.0], [0.0], [theta],[r],[B] ])
+    P = np.diag([1.0, 1.0, 0.1,var_r,var_B])        #variance on the initial state.  These, are guesses.
 
 
 
@@ -63,9 +63,7 @@ def estInitialize():
         x_state,
         P,
         Evv,
-        Eww,
-        r,
-        B]
+        Eww,]
         
 
     studentNames = ['Luai Abuelsamen',

@@ -50,7 +50,7 @@ def estRun(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement):
 
 def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement):
 
-    x_state, P, Evv, Eww, r, B = internalStateIn
+    x_state, P, Evv, Eww = internalStateIn
 
 
     nx = x_state.shape[0]
@@ -58,18 +58,25 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     #Propogate discretized dynamics
     def A(x, u):
         theta = x[2, 0]
-        v_mag = x[3,0]#u[1, 0]
-        steer_angle = x[4,0]
+        r = x[3,0]
+        B = x[4,0]
+
+        v_mag = 5 * r *u[1, 0]#x[3,0]#u[1, 0]
+        steer_angle = u[0,0]#x[4,0]
         return np.array([
             [x[0, 0] + dt *  v_mag * np.cos(theta)],
             [x[1, 0] + dt *  v_mag * np.sin(theta)],
             [x[2, 0] + dt *  (v_mag / B) * np.tan(steer_angle)],
-            [5 * r *u[1, 0] ],
-            [u[0,0]]
+            [x[3, 0]],
+            [x[4, 0]]
+            #[5 * r *u[1, 0] ],
+            #[u[0,0]]
 
         ])
 
     def H(x):
+        B = x[4,0]
+
         x_c = x[0, 0] + 0.5 * B * np.cos(x[2, 0])
         y_c = x[1, 0] + 0.5 * B * np.sin(x[2, 0])
         return np.array([[x_c], [y_c]])
@@ -77,8 +84,17 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     u = np.array([[steeringAngle], [pedalSpeed]])
 
     # generate sigma points
-    S = np.sqrt(nx)*np.linalg.cholesky(P)
+    #print(P)
+    try:
+        S = np.linalg.cholesky(nx*P)
+    except Exception as e:
+        print("ERROPR:",e)
+        P = np.diag(np.diag(P)) #throw away all the cross-covariance terms.
+        S = np.linalg.cholesky(nx*P)
+
     #S = np.sqrt(nx)*linalg.cholesky(P,lower=True)
+    #print("s")
+    #print(S)
 
 
     #num_sigma_points = 2*nx+1 #luai included a sigma point at the current x state - very strange.
@@ -100,7 +116,10 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
             sigma_points[:, i] = (x_state + S[:, i:i+1])  [:, 0]
             sigma_points[:, i + nx] = (x_state - S[:, i:i+1])   [:, 0]
 
-    
+    #Handle roll-over for the sigma points associated with the angles.
+    #sigma_points[2,:] = sigma_points[2,:]% (2*np.pi)
+
+    #print(sigma_points)
     # propogate sigma points through system dynamics
     X_pred = np.zeros((nx, num_sigma_points))
     for i in range(num_sigma_points):
@@ -113,7 +132,7 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     P_pred = Evv.copy()
     for i in range(num_sigma_points):
         dx = X_pred[:, i:i+1] - x_pred
-        P_pred += (1 / (2 * nx)) * dx @ dx.T
+        P_pred += (1 / num_sigma_points) * dx @ dx.T
 
     #propogate through measurement prediction
     Z_pred = np.zeros((2, num_sigma_points))
@@ -136,7 +155,7 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
         P_zz = Eww_used.copy()
         for i in range(num_sigma_points):
             dz = Z_pred_used[:, i:i+1] - z_pred_used
-            P_zz += (1 / (2 * nx)) * dz @ dz.T
+            P_zz += (1 / num_sigma_points) * dz @ dz.T
 
         # Compute cross-covariance
         P_xz = np.zeros((nx, len(valid_indices)))
@@ -144,12 +163,13 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
             dx = X_pred[:, i:i+1] - x_pred
             dx[2] = (dx[2] + np.pi) % (2 * np.pi) - np.pi
             dz = Z_pred_used[:, i:i+1] - z_pred_used
-            P_xz += (1 / (2 * nx)) * dx @ dz.T
+            P_xz += (1 / num_sigma_points) * dx @ dz.T
 
         # Kalman gain and update
         K = P_xz @ np.linalg.inv(P_zz)
         x_state = x_pred + K @ (z - z_pred_used)
-        x_state[2] = (x_state[2] + np.pi) % (2 * np.pi) - np.pi
+        #x_state[2] = (x_state[2] + np.pi) % (2 * np.pi) - np.pi
+        #x_state[2] = (x_state[2]) % (2*np.pi)
         P = P_pred - K @ P_zz @ K.T
     else:
         x_state = x_pred
@@ -157,11 +177,11 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
 
     #print(u)
 
-    #print("Time,",time,u.T,u[1,0]*r*5)
+    #print("Time,",time,u.T,measurement)
     #print(x_state.T)
     #print(np.diag(P))
     #print()
 
     x, y, theta = float(x_state[0, 0]), float(x_state[1, 0]), float(x_state[2, 0])
-    internalStateOut = [x_state, P, Evv, Eww, r, B]
+    internalStateOut = [x_state, P, Evv, Eww]
     return x, y, theta, internalStateOut

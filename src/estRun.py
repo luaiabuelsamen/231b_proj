@@ -116,8 +116,6 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
             sigma_points[:, i] = (x_state + S[:, i:i+1])  [:, 0]
             sigma_points[:, i + nx] = (x_state - S[:, i:i+1])   [:, 0]
 
-    #Handle roll-over for the sigma points associated with the angles.
-    #sigma_points[2,:] = sigma_points[2,:]% (2*np.pi)
 
     #print(sigma_points)
     # propogate sigma points through system dynamics
@@ -174,15 +172,12 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
         P_xz = np.zeros((nx, len(valid_indices)))
         for i in range(num_sigma_points):
             dx = X_pred[:, i:i+1] - x_pred
-            dx[2] = (dx[2] + np.pi) % (2 * np.pi) - np.pi
             dz = Z_pred_used[:, i:i+1] - z_pred_used
             P_xz += (1 / num_sigma_points) * dx @ dz.T
 
         # Kalman gain and update
         K = P_xz @ np.linalg.inv(P_zz)
-        x_state = x_pred + K @ (z - z_pred_used)
-        #x_state[2] = (x_state[2] + np.pi) % (2 * np.pi) - np.pi
-        #x_state[2] = (x_state[2]) % (2*np.pi)
+        x_state = x_pred + K @ (z - z_pred_used)  #do not enforce wrap-around here on the angles
         P = P_pred - K @ P_zz @ K.T
     else:
         x_state = x_pred
@@ -195,6 +190,6 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     #print(np.diag(P))
     #print()
 
-    x, y, theta = float(x_state[0, 0]), float(x_state[1, 0]), float(x_state[2, 0])
+    x, y, theta = float(x_state[0, 0]), float(x_state[1, 0]), float((x_state[2,0] + np.pi) % (2 * np.pi) - np.pi) #enforce wrap-around for the angle output
     internalStateOut = [x_state, P, Evv, Eww]
     return x, y, theta, internalStateOut

@@ -3,7 +3,6 @@ import scipy as sp
 import scipy.linalg as linalg
 
 #NO OTHER IMPORTS ALLOWED (However, you're allowed to import e.g. scipy.linalg)
-np.set_printoptions(precision=3)
 
 
 def estRun(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement):
@@ -191,5 +190,6 @@ def estRunLuai(time, dt, internalStateIn, steeringAngle, pedalSpeed, measurement
     #print()
 
     x, y, theta = float(x_state[0, 0]), float(x_state[1, 0]), float((x_state[2,0] + np.pi) % (2 * np.pi) - np.pi) #enforce wrap-around for the angle output
+    
     internalStateOut = [x_state, P, Evv, Eww]
     return x, y, theta, internalStateOut

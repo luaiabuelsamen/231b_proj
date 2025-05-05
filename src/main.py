@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from estRun import estRun
 from estInitialize import estInitialize
 
+np.set_printoptions(precision=3)
+
 #provide the index of the experimental run you would like to use.
 # Note that using "0" means that you will load the measurement calibration data.
 experimentalRun = 2
@@ -133,6 +135,7 @@ def run_main(experimentalRun,visualize):
 
 
 if __name__ == "__main__": 
+
     #scenarios = [1]#,2,3,4,5]
     visualize = True
     #scenarios = list(np.arange(1,100))
@@ -163,8 +166,6 @@ if __name__ == "__main__":
     print('Our Worst Score: ',np.max(scores),' Scenario: ',scenarios[np.argmax(scores)])
     print('Our Best Score: ',np.min(scores),' Scenario: ',scenarios[np.argmin(scores)])
 
-    #print(np.argsort(scores))
-    #print(scenarios)
 
     print("Scenarios, from best to worst:",scenarios[np.argsort(scores)])
 

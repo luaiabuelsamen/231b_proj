@@ -12,25 +12,7 @@ def estInitialize():
     # 
     # The third return variable must be a string with the estimator type
 
-    #we make the internal state a list, with the first three elements the position
-    # x, y; the angle theta; and our favorite color. 
-    x = 0
-    y = 0
-    theta = 0
-    color = 'green' 
-    # note that there is *absolutely no prescribed format* for this internal state.
-    # You can put in it whatever you like. Probably, you'll want to keep the position
-    # and angle, and probably you'll remove the color.
-    '''
-    internalState = [x,
-                     y,
-                     theta, 
-                     color
-                     ]
-    '''
-
-    #        x_state, P, Evv, Eww, r, B = internalStateIn
-
+    
     #Initial state mean and variance
     # x, y, theta
 
@@ -49,16 +31,12 @@ def estInitialize():
     #show some co-variance between process noise for x and y.  The main process noise is 0.001, but the cross-terms is 0.0005.
     #physical intuition: when you slip in the X, you are probably slipping in the Y, too.  (comes from doug's bike experience fish-tailing.)
 
-
+    #Eww = np.array([[1.08933973,0],[0,2.98795486]])  #straight from examineCalib.py, except, let's pretend that GPS x and y are uncorrelated.
     Eww = np.array([[1.08933973,1.53329122],[1.53329122,2.98795486]])  #straight from examineCalib.py  y GPS is noiser than the X, AND, the errors are correlated.
 
-    #TODO: Augment as latent state
-    r = 0.425
-    B = 0.8
 
 
 
-    internalStateDoug = []
     B =  0.8 # the baseline B is uncertain (to within approximately ±10%)
     var_B = B*(1/12)*((1.1-0.9)**2)   #treat the wheel base as a uniform random variable, over the range from B+10% to B-10%.
     r = 0.425

@@ -38,7 +38,18 @@ def estInitialize():
 
 
     #Process/ Meas noise variance
-    Evv = np.diag([0.001, 0.001, 0.001,0,0])
+    #Evv = np.diag([0.001, 0.001, 0.001,0,0])    #old noise, all independant.  Far, far easier to tune.
+    Evv = np.array([
+       [0.001 , 0.0005, 0.    , 0.    , 0.    ],
+       [0.0005, 0.001 , 0.    , 0.    , 0.    ],
+       [0.    , 0.    , 0.001 , 0.    , 0.    ],
+       [0.    , 0.    , 0.    , 0.    , 0.    ],
+       [0.    , 0.    , 0.    , 0.    , 0.    ]
+       ])  #new process noise.
+    #show some co-variance between process noise for x and y.  The main process noise is 0.001, but the cross-terms is 0.0005.
+    #physical intuition: when you slip in the X, you are probably slipping in the Y, too.  (comes from doug's bike experience fish-tailing.)
+
+
     Eww = np.array([[1.08933973,1.53329122],[1.53329122,2.98795486]])  #straight from examineCalib.py  y GPS is noiser than the X, AND, the errors are correlated.
 
     #TODO: Augment as latent state

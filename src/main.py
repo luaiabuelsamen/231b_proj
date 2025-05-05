@@ -92,6 +92,7 @@ def run_main(experimentalRun,visualize):
         print('Generating plots')
 
         figTopView, axTopView = plt.subplots(1, 1)
+        plt.gca().set_aspect('equal') 
         axTopView.plot(experimentalData[:,3], experimentalData[:,4], 'rx', label='Meas')
         axTopView.plot(estimatedPosition_x, estimatedPosition_y, 'b-*', label='est')
         axTopView.plot(experimentalData[:,5], experimentalData[:,6], 'k:.', label='true')
@@ -133,17 +134,39 @@ def run_main(experimentalRun,visualize):
 
 if __name__ == "__main__": 
     #scenarios = [1]#,2,3,4,5]
-    scenarios = list(np.arange(1,100))
+    visualize = True
+    #scenarios = list(np.arange(1,100))
+    scenarios = [1,2,3,4,5]
+    #scenarios = [77] #the global worst-performing scenario
+    #scenarios = [79] #the global best-performing scenario
+    #scenarios = [48] #another good scenario.
 
     scores = []
+    
+    if len(scenarios) > 10:
+        visualize = False
+        print("too many scenarios to visualize, you'd have too many windows appear")
 
     for run in scenarios:
-        s = run_main(run,visualize=False)
+
+        s = run_main(run,visualize=visualize)
         scores.append(s)
 
+    scores = np.array(scores)
+    scenarios = np.array(scenarios)
 
+    print("-----------")
+    print('MWM score is ~ 1.0798 on average over the first 5 runs')
 
-    print('   MWM score is ~ 1.0798 on average over the first 5 runs')
+    print('Our Mean Score: ',np.mean(scores))
+    print('Our STD Score: ',np.std(scores))
+    print('Our Worst Score: ',np.max(scores),' Scenario: ',scenarios[np.argmax(scores)])
+    print('Our Best Score: ',np.min(scores),' Scenario: ',scenarios[np.argmin(scores)])
 
-    print('   Our Scores: ',np.mean(np.array(scores)))
+    #print(np.argsort(scores))
+    #print(scenarios)
+
+    print("Scenarios, from best to worst:",scenarios[np.argsort(scores)])
+
+    print('\t\t\t')
     plt.show(block=True)

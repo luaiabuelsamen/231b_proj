@@ -32,6 +32,7 @@ if datafile == 'data/run_000.csv':
 	assert np.all(omega[:]==0), 'Non-zero pedal speeds detected in the calibration data!'
 
 
+
 print("Known Bike position:",final_x,final_y)
 
 
@@ -41,15 +42,21 @@ print("GPS STD\t\t",np.nanstd(measx),np.nanstd(measy))
 print("GPS VAR\t\t",np.nanvar(measx),np.nanvar(measy))
 print("GPS BIAS\t",final_x-np.nanmean(measx),final_y-np.nanmean(measy))
 print("GPS Normal Test",stats.normaltest(np.nanmean(measx)-measx,nan_policy='omit'),stats.normaltest(np.nanmean(measy)-measy,nan_policy='omit'))
-print("----------")
+print("--------------    GPS Biased?  --------------")
 print("GPS ERROR\t\t",np.nanmean(measx)-final_x,np.nanmean(measy)-final_y)
 print("GPS Standard Error of the Mean",np.nanstd(measx-final_x)/np.sqrt(np.count_nonzero(~np.isnan(measx))),np.nanstd(measy-final_y)/np.sqrt(np.count_nonzero(~np.isnan(measy))))
 print("N Sigma:\t\t",(np.nanmean(measx)-final_x)/(np.nanstd(measx)/np.sqrt(np.count_nonzero(~np.isnan(measx)))),(np.nanmean(measy)-final_y)/(np.nanstd(measy)/np.sqrt(np.count_nonzero(~np.isnan(measy)))))
 
 
+print('------   Analysis to See if Errors are Indpendant   ----------')
+non_nan_locs = np.where(~np.isnan(measx))
+
+errs_x = measx[non_nan_locs]-final_x
+errs_y = measy[non_nan_locs]-final_y
+print("Covariance Matrix: ")
+print(np.cov(np.vstack((errs_x,errs_y))))
 
 print("----------")
-non_nan_locs = np.where(~np.isnan(measx))
 print("Average Period:",np.mean(np.diff(t[non_nan_locs])))
 
 plt.figure()

@@ -39,7 +39,7 @@ def estInitialize():
 
     #Process/ Meas noise variance
     Evv = np.diag([0.001, 0.001, 0.001,0,0])
-    Eww = np.diag([1.088070104075678, 2.9844723942433373])       #per examilneCalib.py, the y GPS is much noiser than the X
+    Eww = np.array([[1.08933973,1.53329122],[1.53329122,2.98795486]])  #straight from examineCalib.py  y GPS is noiser than the X, AND, the errors are correlated.
 
     #TODO: Augment as latent state
     r = 0.425
